@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Campaigning</title>
+</head>
+<body>
+    <div class="bg-success p-2 text-dark bg-opacity-25">
+        <div class="task-bar btn-group" role="group" aria-label="Basic example">
+
+    <h2>Sponsor Dashboard</h2>
+    &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            
+    <button onclick="showSection('sponsorprofile')">Profile</button>
+    <button onclick="showSection('sponsorupdateprofile')">Update Profile</button>
+    <button onclick="showSection('mycampaign')">My Campaigns</button>
+    <button onclick="showSection('searchinfluencers')">Search Influencers</button>
+    <button onclick="showSection('createcampaign')">Create Campaign</button>
+    <button onclick="showSection('requestinfluencer')">Request</button>
+    <button onclick="logout()">Logout</button>
+</div>
+</div>
+<!-- Add your content below the task bar -->
+ <section id = "sponsorprofile">
+    <div id = 'profile_content' class="position-absolute top-50 start-50 translate-middle">
+        
+    </div>
+ </section>
+
+ <section id = "sponsorupdateprofile">
+    <div id = 'update_profile' class="position-absolute top-50 start-50 translate-middle">
+        
+    </div>
+ </section>
+
+ <section id="mycampaign">
+    <div class="card container-md" id="campaign_container" >
+       
+    </div>
+</section>
+
+<!-- Section 3 -->
+<section id="searchinfluencers">
+    <div class="card container-md" id="influencer_container">
+       
+    </div>
+</section>
+
+<section id="createcampaign">
+    <div id = 'create_campaign' class="position-absolute top-50 start-50 translate-middle">
+
+    </div>
+</section>
+
+<section id="requestinfluencer">
+    <div id = 'request_influencer' class="position-absolute top-50 start-50 translate-middle">
+
+    </div>
+</section>
+
+
+<script>
+    function showSection(sectionId) {
+            // Hide all sections
+            var sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            var selectedSection = document.getElementById(sectionId);
+            selectedSection.style.display = 'block';
+            var name = "{{username}}"
+
+            switch (sectionId) {
+                case 'sponsorprofile':
+                    
+                        
+    
+                            let profile_form = document.getElementById('sponsorprofile')
+                            let profile_data = ""
+                            fetch('/api/sponsor_profile/'+name)
+                            .then(
+                                    res => {
+                                                                                                if (!res.ok){
+                                                                                        console.log("error happend")                                                                                        
+                                                                                    }
+                                                                        return res.json() 
+                                                                      }
+                                                             )
+                                                        .then(
+                                                                data => {
+                                                                    profile_data=JSON.parse(data) 
+                                                                            console.log(profile_data)
+                                                                            let content = document.getElementById('profile_content')
+                                                                            let html = "<h1>Welcome "+name+"</h1><p><h2>Profile Overview</h2></p>"
+
+                                                                            for (let key in profile_data) {
+                                                                                if (profile_data.hasOwnProperty(key)) {
+                                                                                html += `<p><h3><strong>${key}:</strong> ${profile_data[key]}</h3></p>`;
+                                                                                
+                                                                            }
+                                                                            
+                                                                        }
+                                                                        
+                                                                    
+                                                                        
+    
+                                                                            
+
+                                                                            content.innerHTML = html
+                                                                       }
+                                                             )
+                    
+                    break;
+                case 'sponsorupdateprofile':
+                    let update_profile_form = document.getElementById('sponsorupdateprofile')
+                        let update_profile_data = ""
+                        fetch('/api/sponsor_profile/'+name)
+                        .then(
+                            res => {
+                                if (!res.ok){
+                                    console.log("error happened")
+                                }
+                                return res.json()
+                            }
+                        )
+                        .then(
+                            data => {
+                                update_profile_data = JSON.parse(data)
+                                
+                                let content = document.getElementById('update_profile')
+                                let html = `<form action = '/update_sponsor/{{username}}' method = 'POST'>
+                                    <table>
+                                        <tr>
+                                            <td>Comapny</td>
+                                            <td><input type="text" id = "name" name = "name" value = ${update_profile_data['Name']} disabled></td>
+                                        <tr>
+                                            <td>Industry</td>
+                                            <td><input type="text" id = "industry" name = "industry" value = "${update_profile_data["Industry"]}"></td>
+                                        <tr><td>Budget</td><td>
+                                <input type="text" id = "budget" name = "budget" value = ${update_profile_data['Budget']}></td><tr><td>
+                            
+                                            <tr>
+                                            <td>
+                                            <tr>
+                                                <td>Bio</td>
+                                                <td><input type="text" id = "bio" name = "bio" value = "${update_profile_data["Bio"]}"></td>
+                                            <tr>
+                                                <td>
+                                                <tr>
+                                                    <td>Email</td>
+                                                    <td><input type="text" id = "email" name = "email" value = ${update_profile_data['Email']} disabled></td>
+                                                <tr>
+                                                    <td><input type="submit" value = 'Update'></td>
+                                                </tr>
+                                    </form>`;
+                                content.innerHTML = html
+                            }
+                        )
+                    break;
+                case 'mycampaign':
+                    let campaign_form = document.getElementById('mycampaign')
+                    let campaign_data = ""
+                    console.log('my campaign')
+                    fetch('/api/sponsor_campaigns/'+name)
+                    .then(
+                        res => {
+                            if(!res.ok){
+                                console.log("error happened")
+                            }
+                            return res.json()
+                        }
+                    )
+                    .then(data => {
+                    const tilesContainer = document.getElementById('campaign_container');
+                    
+                    
+
+                    // Clear any existing tiles
+                    tilesContainer.innerHTML = '';
+
+                    // Populate the tiles with campaign data
+                    data.forEach(campaign => {
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.innerHTML = `<div class="col-md-4">
+                            <h3 class="card-title">${campaign.name}</h3>
+                            <p><strong>Description:</strong> ${campaign.description}</p>
+                            <p><strong>Start Date:</strong> ${campaign.start_date}</p>
+                            <p><strong>End Date:</strong> ${campaign.end_date}</p>
+                            <p><strong>Industry:</strong> ${campaign.industry}</p>
+                            <p><strong>Visibility:</strong> ${campaign.visibility}</p>
+                            <div class="d-flex align-items-center">
+                            <button onclick="showUpdateForm('${campaign.name}','${campaign.description}','${campaign.start_date}','${campaign.end_date}','${campaign.budget}','${campaign.industry}','${campaign.visibility}')" class="d-flex align-items-center">Update</button>
+                            <form action = '/delete_campaign/{{username}}/${campaign.name}' method='POST'  class="d-flex align-items-center">
+                                <input type="submit" value="Delete"> 
+                            </form>
+                            </div>
+                            </div>
+                            
+                            <div id = "updateFormContainer" style="display:none;">
+                            <h2>Update Campaign</h2>
+                            <form id = "updateform" method = "POST" action = "/update_campaign/{{username}}">
+                            <table>
+                                <tr>
+                                    <td>Campaign Name: </td>
+                                    <td><input type="text" id = "campaign_name" name="campaign_name" disables></td>
+                                </tr>
+                                <tr>
+                                    <td>Description: </td>
+                                    <td><input type="text" id="description" name = 'description'></td>
+                                </tr>
+                                <tr>
+                                    <td>Start Date: </td>
+                                    <td><input type="date" id="start_date" name = 'start_date'></td>
+                                </tr>
+                                <tr>
+                                    <td>End Date: </td>
+                                    <td><input type="date" id="end_date" name = 'end_date'></td>
+                                </tr>
+                                <tr>
+                                    <td>Industry: </td>
+                                    <td><input type="text" id="industry" name = 'industry'></td>
+                                </tr>
+                                <tr>
+                                    <td>Budget: </td>
+                                    <td><input type="text" id="budget" name = 'budget'></td>
+                                </tr>
+                                <tr>
+                                    <td>Visibility: </td>
+                                    <td><input type="text" id="visibility" name='visibility'></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="submit" value="Update"> </td>
+                                </tr>
+                            </table>
+                        </form>
+                        </div>
+                        `;
+                        
+                       
+                        tilesContainer.appendChild(tile);
+                    });
+                    
+                })
+                            
+                    
+                                        break;
+                    case 'searchinfluencers':
+                        let searchform = document.getElementById('searchinfluencers')
+                        let influencer_data = ""
+                        let campaigns = ""
+                        console.log('search influencer')
+                        fetch('/api/searchinfluencer/'+name)
+                        .then(
+                            res => {
+                                if(!res.ok){
+                                    console.log("error happened")
+                                }
+                                return res.json()
+                            }
+                        )
+                        .then(data => {
+                    const tilesContainer = document.getElementById('influencer_container');
+                    
+                    
+
+                    // Clear any existing tiles
+                    tilesContainer.innerHTML = '';
+
+                    // Populate the tiles with campaign data
+                    data.forEach(influencer_data => {
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.innerHTML = `<div class="card row"><div class="col-md-4">
+                            <h3 class="card-title">Name: ${influencer_data.name}</h3>
+                            <p><strong>Email:</strong> ${influencer_data.email}</p>
+                            <p><strong>Category:</strong> ${influencer_data.category}</p>
+                            <p><strong>Bio:</strong> ${influencer_data.bio}</p>
+                            <p><strong>Reach:</strong> ${influencer_data.reach}</p>
+                            <form action="/popup/{{username}}/${influencer_data.id}" method="GET">
+                                <input type="submit" value="Send Request">
+                            </form></div><br><br>
+                        `;
+                        tilesContainer.appendChild(tile);
+                    });
+                })
+                        
+                        data.forEach(campaign => {
+                            const tile = document.createElement('div');
+                            tile.className = 'tile';
+                            tile.innerHTML = ``;
+                        })
+                        break;
+
+                        case 'createcampaign':
+                            let create_campaign = document.getElementById('create_campaign')
+                            html = `<form action='/create_campaign/{{username}}' method = 'POST'>
+                            <h2>Create Campaign</h2>
+                            <table>
+                                <tr>
+                                    <td>Campaign Name: </td>
+                                    <td><input type="text" name="campaign_name" placeholder="Campaign Name"></td>
+                                </tr>
+                                <tr>
+                                    <td>Description: </td>
+                                    <td><input type="text" name="description" placeholder="Description"></td>
+                                </tr>
+                                <tr>
+                                    <td>Start Date: </td>
+                                    <td><input type="date" name="start_date" placeholder="dd/mm/yyyy"></td>
+                                </tr>
+                                <tr>
+                                    <td>End Date: </td>
+                                    <td><input type="date" name="end_date" placeholder="dd/mm/yyyy"></td>
+                                </tr>
+                                <tr>
+                                    <td>Industry: </td>
+                                    <td><input type="text" name="industry" placeholder="industry"></td>
+                                </tr>
+                                <tr>
+                                    <td>Budget: </td>
+                                    <td><input type="text" name="budget" placeholder="Budget"></td>
+                                </tr>
+                                <tr>
+                                    <td>Visibility: </td>
+                                    <td><input type="text" name="visibility" placeholder="Visibility"></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="submit" value="Create"> </td>
+                                </tr>
+                            </table>
+                            </form>
+                            `
+                            create_campaign.innerHTML = html
+                            break;
+                        case 'requestinfluencer':
+                            let request_data = ""
+                            console.log('inside request influencer')
+                            fetch('/api/requestinfluencer/'+name)
+                            .then(
+                                res => {
+                                if (!res.ok){
+                                    console.log("error happened")
+                                }
+                                return res.json()
+                                        }
+                                )
+                            .then(
+                                data => {
+                                    console.log(data)
+                                    
+                                    let content = document.getElementById('request_influencer')
+                                
+                                    data.forEach(item => {
+                                        let html = `<table class='table'>
+                                    <tr>
+                                        <th>Influencer Name</th>
+                                        <th>Campaign Name</th>
+                                        <th>Message</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>`;
+                                    html += `<tr><td>${item.influencer_name}</td>
+                                        <td>${item.campaign_name}</td>
+                                        <td>${item.message}</td>
+                                        <td>${item.negotiation}</td>
+                                        <td>${item.status}</td>
+                                        <td><div class="d-flex align-items-center"><form action="/accept_request/{{username}}/${item.id}/${item.camp_id}" method="POST" class="d-flex align-items-center">
+                                            <input type="submit" value="Accept"> 
+                                            </form>
+                                            <form action="/reject_request/{{username}}/${item.id}" method="POST" class="d-flex align-items-center">
+                                            <input type="submit" value="Reject"> 
+                                            </form>
+                                            </div>
+                                            </td>
+                                        </tr>`;
+                                        html += "</table>"
+                                    content.innerHTML = html
+                                    
+                                });
+
+                                    
+                                    }
+                                    
+                                )
+                                
+                            
+                            
+                            break;
+                                }
+                            }
+                                                                                        
+                                                                                // Initially show the first section
+        showSection('sponsorprofile');
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        function showUpdateForm(campaign_name,description,start_date,end_date,budget,industry,visibility) {
+            document.getElementById('campaign_name').value = campaign_name;
+            document.getElementById('description').value = description;
+            document.getElementById('start_date').value = start_date;
+            document.getElementById('end_date').value = end_date;
+            document.getElementById('budget').value = budget;
+            document.getElementById('industry').value = industry;
+            document.getElementById('visibility').value = visibility;
+                
+               document.getElementById('updateFormContainer').style.display = 'block';
+        }
+        
+        
+      
+                            
+</script>
+</body>
+</html>
+

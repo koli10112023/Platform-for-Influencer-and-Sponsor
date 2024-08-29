@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang = 'en'>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <title>Campaigning</title>
+    </head>
+    <body>
+        <div class="bg-success p-2 text-dark bg-opacity-25">
+            <div class="task-bar btn-group" role="group" aria-label="Basic example">
+    
+       
+            <h1>Admin Dashboard</h1>
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp;	
+            
+            <button onclick="showSection('sponsorapproval')">Dashboard</button>
+            <button onclick="showSection('manageuser')">Manage Users</button>
+            <button onclick="logout()">Logout</button>
+       </div>
+       </div>
+       <section id="sponsorapproval">
+        <div id="count_content">
+
+        </div>
+            <div id="approval_content">
+
+            </div>
+       </section>
+       <section id="manageuser">
+        <div id="alluser" class="position-absolute top-50 start-50 translate-middle">
+
+        </div>
+       </section>
+       <script>
+            function showSection(sectionId){
+                // Hide all sections
+            var sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            var selectedSection = document.getElementById(sectionId);
+            selectedSection.style.display = 'block';
+
+            
+
+            switch(sectionId){
+                case 'sponsorapproval':
+                        console.log('inside sponsor approval')
+                        let profile_form = document.getElementById('sponsorapproval')
+                        let profile_data = ""
+                        fetch('/api/number_of_user')
+                        .then(
+                            res => {
+                                if(!res.ok){
+                                    console.log("error happend")
+                                }
+                                return res.json()
+                            }
+                        )
+                        .then(
+                            data => {
+                                count_data = JSON.parse(data)
+                                let content = document.getElementById('count_content')
+                                let html = `<table class="table table-sm text-primary">
+                                    <tr>
+                                        <th><h1>Number of Sponsors: </h1></th>
+                                        <td><h1>${count_data.sponsor}</h1></td>
+                                    </tr>
+                                    <tr>
+                                        <th><h1>Number of Influencers: </h1></th>
+                                        <td><h1>${count_data.influencer}</h1></td>
+                                    </tr>
+                                    <tr>
+                                        <th><h1>Number of Campaigns: </h1></th>
+                                        <td><h1>${count_data.campaign}</h1></td>
+                                    </tr>
+                                    </table>`;
+                                content.innerHTML = html
+
+                            }
+                            
+                        )
+                        fetch('/api/pending_approval')
+                        .then(
+                            res => {
+                                if (!res.ok){
+                                    console.log("error happend")                                                                                        
+                                }
+                                return res.json() 
+                            }
+                        )
+                        .then(
+                            data => {
+                                let content = document.getElementById('approval_content')
+                                let html = `<h2 class="text-success">Waiting for Approvals</h2></p><table class="table">
+                                    <tr>
+                                            <th>Sponsor Name</th>
+                                            <th>Industry</th>
+                                            <th>Budget</th>
+                                            <th>Bio</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    `;
+                                data.forEach(item => {
+                                    html += `
+                                        <tr>
+                                            <td>${item.name}</td>
+                                            <td>${item.industry}</td>
+                                            <td>${item.budget}</td>
+                                            <td>${item.bio}</td>
+                                            <td><div class="d-flex align-items-center">
+                                                <form action="/accept_sponsor/${item.id}" method="POST" class="d-flex align-items-center">
+                                                <input type="submit" value="Accept">
+                                                </form>
+                                                <form action="/reject_sponsor/${item.id}" method="POST" class="d-flex align-items-center">
+                                            <input type="submit" value="Reject"></td>
+                                            </form></div>
+                                        </tr>`;
+                                
+                                })
+                                html += `</table>`;
+                                content.innerHTML = html
+                            }
+                        )
+
+                    
+                        break;
+                    case 'manageuser':
+                        let manage_user_form = document.getElementById('manageuser')
+                        fetch('/api/all_user')
+                        .then(
+                            res => {
+                                if(!res.ok){
+                                    console.log("error happend")
+                                }
+                                return res.json()
+                            }
+                        )
+                        .then(
+                            data => {
+                                let content = document.getElementById('alluser')
+                                let html = `<table class="table">
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>User Type</th>
+                                        <th>Email</th>
+                                        <th>Category</th>
+                                        <th>Bio</th>
+                                        <th>Flagged</th>
+                                        <th>Number of Campaigns Completed</th>
+                                        <th>Actions</th>
+                                    </tr>`;
+                                    data.forEach(item => {
+                                        html += `<tr>
+                                            <td>${item.name}</td>
+                                            <td>${item.user_type}</td>
+                                            <td>${item.email}</td>
+                                            <td>${item.category}</td>
+                                            <td>${item.bio}</td>
+                                            <td>${item.flagged}</td>
+                                            <td>${item.number_of_camp}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <form action="/flag_user/${item.user_type}/${item.id}/${item.flagged}" method="POST"  class="d-flex align-items-center">
+                                                        <input type='submit' value='Change Flag'>
+                                                    </form>
+                                                    <form action="/delete_user/${item.user_type}/${item.id}" method="POST"  class="d-flex align-items-center">
+                                                        <input type='submit' value='Delete User'>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                            </tr>`;
+
+                                    });
+                                    html += `</table>`;
+                                    content.innerHTML = html
+                            }
+                        )
+                        
+                        break;
+                }
+            }
+            showSection('sponsorapproval');
+            function logout() {
+            fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+       </script>
+    </body>
+</html>

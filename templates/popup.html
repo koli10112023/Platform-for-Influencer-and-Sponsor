@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Campaigning</title>
+</head>
+<body>
+    <div id="campaigns" class="bg-success p-2 text-dark bg-opacity-25">
+        <h2>Campaigns</h2>
+        
+    </div>
+    <div id="containers" class="position-absolute top-50 start-50 translate-middle"></div>
+    <script>
+        var name = '{{username}}'
+        let content = document.getElementById('containers')
+        let campaign_data = ""
+        console.log(name)
+        fetch('/api/popup_campaigns/'+name)
+        .then(
+            res => {
+                if(!res.ok){
+                    console.log("error happend")
+                }
+                return res.json()
+            }
+        )
+        .then(data => {
+            html = ``;
+            data.forEach(campaign => {
+                html += `<div><form action='/request_influencer/{{username}}/{{id}}' method='POST'>
+                <br><label><h3>
+                <input type="radio" name = 'option' value="${campaign.name}">${campaign.name}</h3></label>
+                `;
+                
+            });
+            html += `<br><input type="submit" value="Send">
+            </form></div>`;
+            content.innerHTML = html;
+        })
+    </script>
+</body>
+</html>
